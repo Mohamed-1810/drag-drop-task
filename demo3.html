@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Draggable Div</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!--jQuery library-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <!--Latest compiled and minified JavaScript-->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="container" style="margin-bottom:50px;">
+    <div id="head">
+      <hr>
+      <h1 id="heading">Gray Dot Technologies</h1>
+      <hr>
+    </div>
+    <div class="row" styl="margin-bottom: 20px;padding-bottom:20px;">
+      <div class="col-xs-offset-1 col-xs-4 bor">
+
+        <div class="item">
+          <!-- <p>Drag Me</p> -->
+          <span id="draggable-elem1" class="draggable-elem">
+            <h3 style="background-color:rgba(35, 33, 33, 0.705);color:aliceblue;border-radius:10px;">Click Me First and
+              then Drag Me </h3>
+          </span>
+        </div>
+
+        <div class="item">
+          <img id="draggable-elem2" class="draggable-elem" src="./assets/wallpaper.jpg" width="100%">
+        </div>
+        <div class="item">
+          <img id="draggable-elem3" class="draggable-elem" src="./assets/1.jpg" width="100%">
+        </div>
+        <div class="button">
+          <button type="button" id="reset" class="btn btn-dark">Reset</button>
+        </div>
+      </div>
+    </div>
+    <div class="empty" style="height:50px;background-color:#6414e9;"></div>
+  </div>
+
+  <!-- </div> -->
+  <!-- Script -->
+  <script>
+
+
+
+    let draggableElem = document.getElementsByClassName("draggable-elem");
+    console.log(draggableElem.length);
+    for (var i = 0; i < draggableElem.length; i++) {
+      console.log(draggableElem[i].id);
+      let id = draggableElem[i].id;
+      document.getElementById(draggableElem[i].id).addEventListener('click', function () {
+        handleDrag(id);
+      });
+
+    }
+    function handleDrag(arg) {
+      var el = document.getElementById(arg);
+      console.log(el);
+      let initialX = 0,
+        initialY = 0;
+      let moveElement = false;
+      //Events Object
+      let events = {
+        mouse: {
+          down: "mousedown",
+          move: "mousemove",
+          up: "mouseup",
+        },
+        touch: {
+          down: "touchstart",
+          move: "touchmove",
+          up: "touchend",
+        },
+      };
+      let deviceType = "";
+      //Detech touch device
+      const isTouchDevice = () => {
+        try {
+             //We try to create TouchEvent (it would fail for desktops and throw error)
+  
+          document.createEvent("TouchEvent");
+          deviceType = "touch";
+          return true;
+        } catch (e) {
+          deviceType = "mouse";
+          return false;
+        }
+      };
+      isTouchDevice();
+
+      //Start (mouse down / touch start)
+      el.addEventListener(events[deviceType].down, (e) => {
+        e.preventDefault();
+        //initial x and y points
+        initialX = !isTouchDevice() ? e.clientX : e.touches[0].clientX;
+        initialY = !isTouchDevice() ? e.clientY : e.touches[0].clientY;
+        //Start movement
+        moveElement = true;
+      });
+      //Move
+      el.addEventListener(events[deviceType].move, (e) => {
+        //if movement == true then set top and left to new X andY while removing any offset
+        if (moveElement) {
+          e.preventDefault();
+          let newX = !isTouchDevice() ? e.clientX : e.touches[0].clientX;
+          let newY = !isTouchDevice() ? e.clientY : e.touches[0].clientY;
+          el.style.top = el.offsetTop - (initialY - newY) + "px";
+          el.style.left =
+            el.offsetLeft - (initialX - newX) + "px";
+          initialX = newX;
+          initialY = newY;
+        }
+      });
+      
+      //mouse up / touch end
+      el.addEventListener(
+        events[deviceType].up,
+        (stopMovement = (e) => {
+          moveElement = false;
+        })
+      );
+      el.addEventListener("mouseleave", stopMovement);
+      el.addEventListener(events[deviceType].up, (e) => {
+        moveElement = false;
+      });
+
+      var el1 = document.getElementById("draggable-elem1");
+      var el2 = document.getElementById("draggable-elem2");
+      var el3 = document.getElementById("draggable-elem3");
+      var resetButton = document.getElementById("reset");
+
+          // Retrieve the current screen size
+      var screenWidth = window.innerWidth;
+      var screenHeight = window.innerHeight;
+      console.log(screenWidth);
+      if(screenWidth<600)
+      {
+      var originalPosition = {
+        x1: 0,
+        y1: 10,
+        x2: 0,
+        y2: 200,
+        x3: 0,
+        y3: 400,
+      };
+    }
+    else{
+      var originalPosition = {
+        x1: 120,
+        y1: 10,
+        x2: 120,
+        y2: 200,
+        x3: 120,
+        y3: 400,
+      };
+
+    }
+      
+
+
+      function resetImagePosition() {
+        console.log(originalPosition);
+        console.log(el1);
+        el1.style.top = originalPosition.y1 + "px";
+        el1.style.left = originalPosition.x1 + "px";
+
+        el2.style.top = originalPosition.y2 + "px";
+        el2.style.left = originalPosition.x2 + "px";
+
+        el3.style.top = originalPosition.y3 + "px";
+        el3.style.left = originalPosition.x3 + "px";
+      }
+
+
+      resetButton.addEventListener("click", resetImagePosition);
+
+    }
+  </script>
+</body>
